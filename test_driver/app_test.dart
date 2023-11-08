@@ -22,234 +22,121 @@ void main() {
       Given I am on the Button select screen
       When I tap "USD to BTC"
       And I enter "5000"
-      And I tap "Submit"
-      Then I should see 0.143
+      And I tap "Convert"
+      Then I should see ""
     */
-    test("should give USD to BTC", () async {
-      // your code here
-      // at start, we expect to see "What coffee maker are you using?"
-      final coffeeMakerQuestion = find.byValueKey('coffee-maker-question');
-      expect(await driver.getText(coffeeMakerQuestion), "What coffee maker are you using?");
+    test("should give conversion from USD to BTC", () async {
+      // at start, we expect to see "Select Conversion Direction:"
+      final selectQuestion = find.byValueKey('select-question');
+      expect(await driver.getText(selectQuestion), "Select Conversion Direction:");
 
-      // When I tap "French Press" And I tap "Continue"
-      // we expect the prompt "How many cups would you like?"
-      final frenchPressButton = find.byValueKey('french-press-btn');
-      await driver.tap(frenchPressButton);
-      final continueButton = find.byValueKey('continue-btn');
-      await driver.tap(continueButton);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
+      // When I tap "USD to BTC"
+      // we expect the prompt "Enter USD"
+      final usdToBtcButton = find.byValueKey('USD-to-BTC-btn');
+      await driver.tap(usdToBtcButton);
+      expect(await driver.getText(find.text("Enter USD")), "Enter USD");
 
-      // And I enter "5" And I tap "Continue"
-      // we expect to be taken to the recommended screen
+      // And I enter "5000" And I tap "Convert" Then I should see "0.14"
+      // we expect to see the accurate conversion
+      final textBox = find.byValueKey('text-box');
+      await driver.tap(textBox);
+      await driver.enterText('5000');
+      await driver.waitFor(find.text('5000'));
+      final convertButton = find.byValueKey('convert-btn');
+      await driver.tap(convertButton);
+      final resultText = find.byValueKey('result-textbox');
+      expect(await driver.getText(resultText), "0.14");
+      await driver.tap(find.pageBack());
+    });
+
+    
+
+  
+    test("should give conversion from BTC to USD", () async {
+      // at start, we expect to see "Select Conversion Direction:"
+      final selectQuestion = find.byValueKey('select-question');
+      expect(await driver.getText(selectQuestion), "Select Conversion Direction:");
+
+      // When I tap "BTC to USD"
+      // we expect the prompt "Enter BTC"
+      final btcToUsdButton = find.byValueKey('BTC-to-USD-btn');
+      await driver.tap(btcToUsdButton);
+      expect(await driver.getText(find.text('Enter BTC')), 'Enter BTC');
+
+      // And I enter "5" And I tap "Convert" Then I should see ""
+      // we expect to see the accurate conversion
       final textBox = find.byValueKey('text-box');
       await driver.tap(textBox);
       await driver.enterText('5');
       await driver.waitFor(find.text('5'));
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
-      final recommended = find.byValueKey('recommended');
-      expect(await driver.getText(recommended), "Recommended");
-
-      // Then I should see "61g - course ground coffee" And I should see "851g - water"
-      // we expect to see the correct calculation on the screen
-      final coffeeGrounds = find.byValueKey('coffee-grounds');
-      expect(await driver.getText(coffeeGrounds), "61g - course ground coffee");
-      final waterInGrams = find.byValueKey('water-amount');
-      expect (await driver.getText(waterInGrams), "851g - water");
+      final convertButton = find.byValueKey('convert-btn');
+      await driver.tap(convertButton);
+      final resultText = find.byValueKey('result-textbox');
+      expect(await driver.getText(resultText), "174405.00");
+      await driver.tap(find.pageBack());
     });
-
-    /*
-      Given I am on the Coffee Device Selection Screen
-      When I tap "Drip Machine"
-      And I tap "Continue"
-      And I enter "5"
-      And I tap "Continue"
-      Then I should see "52g - medium ground coffee"
-      And I should see "887g - water"
-    */
-    test("should give recommendation for Drip Machine", () async {
-      //your code here
-      // from the previous test, we should be on the recommended screen
-      // we expect to see "What coffee maker are you using?" after clicking on "Done"
-      final doneButton = find.byValueKey('done-btn');
-      await driver.tap(doneButton);
-      final coffeeMakerQuestion = find.byValueKey('coffee-maker-question');
-      expect(await driver.getText(coffeeMakerQuestion), "What coffee maker are you using?");
-
-      // When I tap "Drip Machine" And I tap "Continue"
-      // we expect the prompt "How many cups would you like?"
-      final dripMachineButton = find.byValueKey('drip-machine-btn');
-      await driver.tap(dripMachineButton);
-      final continueButton = find.byValueKey('continue-btn');
-      await driver.tap(continueButton);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
-
-      // And I enter "5" And I tap "Continue"
-      // we expect to be taken to the recommended screen
-      final textBox = find.byValueKey('text-box');
-      await driver.tap(textBox);
-      await driver.enterText('5');
-      await driver.waitFor(find.text('5'));
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
-      final recommended = find.byValueKey('recommended');
-      expect(await driver.getText(recommended), "Recommended");
-
-      // Then I should see "50g - medium ground coffee" And I should see "851g - water"
-      // we expect to see the correct calculation on the screen
-      final coffeeGrounds = find.byValueKey('coffee-grounds');
-      expect(await driver.getText(coffeeGrounds), "50g - medium ground coffee");
-      final waterInGrams = find.byValueKey('water-amount');
-      expect (await driver.getText(waterInGrams), "851g - water");
-    });
-  });
 
   group('Sad Paths', () {
     /*
-      Given I am on the Coffee Device Selection Screen
-      When I press "Continue"
-      Then I expect to still be on the Coffee Device Selection Screen
+    Given I am on the Button select screen
+    When I tap "USD to BTC"
+    And I enter "-1"
+    And I tap "Convert"
+    Then I should see "Enter a valid USD value"
     */
-    test("should not advance from Choose Device Screen without a selection", () async {
-      //your code here
-      // from the previous test, we should be on the machine selector screen 
-      // we expect to see "What coffee maker are you using?" after clicking on "Done"
-      final doneButton = find.byValueKey('done-btn');
-      await driver.tap(doneButton);
+    test("should not give conversion from USD to BTC for -1", () async {
+      // at start, we expect to see "Select Conversion Direction:"
+      final selectQuestion = find.byValueKey('select-question');
+      expect(await driver.getText(selectQuestion), "Select Conversion Direction:");
 
-      // we expect to remain in the choose device screen
-      final continueButton = find.byValueKey('continue-btn');
-      await driver.tap(continueButton);
-      final coffeeMakerQuestion = find.byValueKey('coffee-maker-question');
-      expect(await driver.getText(coffeeMakerQuestion), "What coffee maker are you using?");
-    });
+      // When I tap "USD to BTC"
+      // we expect the prompt "Enter USD"
+      final usdToBtcButton = find.byValueKey('USD-to-BTC-btn');
+      await driver.tap(usdToBtcButton);
+      expect(await driver.getText(find.text("Enter USD")), "Enter USD");
 
-    /*
-      Given I chose "French Press" on the Coffee Device Selection Screen
-      And I advanced to the Choose Cups Screen
-      When I press "Continue"
-      Then I expect to still be on the Choose Cups Screen
-    */
-    test("should not advance from Choose Cups Screen without cups", () async {
-      //your code here
-      final frenchPressButton = find.byValueKey('french-press-btn');
-      await driver.tap(frenchPressButton);
-      final continueButton = find.byValueKey('continue-btn');
-      await driver.tap(continueButton);
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
-    });
-
-    /*
-      Given I chose "French Press" on the Coffee Device Selection Screen
-      And I advanced to the Choose Cups Screen
-      When I enter "-1"
-      And I press "Continue"
-      Then I expect to still be on the Choose Cups Screen
-    */
-    test("should not advance from Choose Cups Screen with negative cup amount", () async {
-      //your code here
-      // from previous test, we should be in the Choose cups screen
+      // And I enter "-1" And I tap "Convert" Then I should see "Enter a valid USD value"
+      // we expect to see the error message
       final textBox = find.byValueKey('text-box');
       await driver.tap(textBox);
       await driver.enterText('-1');
       await driver.waitFor(find.text('-1'));
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
+      final convertButton = find.byValueKey('convert-btn');
+      await driver.tap(convertButton);
+      expect(await driver.getText(find.text("Enter a valid USD value")), "Enter a valid USD value");
+      await driver.tap(find.pageBack());
     });
 
     /*
-      Given I chose "Drip Machine" on the Coffee Device Selection Screen
-      And I advanced to the Choose Cups Screen
-      When I press "Continue"
-      Then I expect to still be on the Choose Cups Screen
+    Given I am on the Button select screen
+    When I tap "BTC to USD"
+    And I enter "-1"
+    And I tap "Convert"
+    Then I should see "Enter a valid BTC value"
     */
-    test("should not advance from Choose Cups Screen without cups", () async {
-      //your code here
-      // from previous test, we are in the choose cups screen
-      // the following is done to reset the app at the choose machine screen
-      final textBox = find.byValueKey('text-box');
-      await driver.tap(textBox);
-      await driver.enterText('');
-      await driver.waitFor(find.text(''));
-      await driver.enterText('1');
-      await driver.waitFor(find.text('1'));
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
+    test("should not give conversion from BTC to USD for -1", () async {
+      // at start, we expect to see "Select Conversion Direction:"
+      final selectQuestion = find.byValueKey('select-question');
+      expect(await driver.getText(selectQuestion), "Select Conversion Direction:");
 
-      // we expect to see the machine collector when we click on "Done"
-      final doneButton = find.byValueKey('done-btn');
-      await driver.tap(doneButton);
-      final coffeeMakerQuestion = find.byValueKey('coffee-maker-question');
-      expect(await driver.getText(coffeeMakerQuestion), "What coffee maker are you using?");
+      // When I tap "BTC to USD"
+      // we expect the prompt "Enter BTC"
+      final btcToUsdButton = find.byValueKey('BTC-to-USD-btn');
+      await driver.tap(btcToUsdButton);
+      expect(await driver.getText(find.text("Enter BTC")), "Enter BTC");
 
-
-      // test user story
-      final dripMachineButton = find.byValueKey('drip-machine-btn');
-      await driver.tap(dripMachineButton);
-      final continueButton = find.byValueKey('continue-btn');
-      await driver.tap(continueButton);
-      await driver.tap(continueButton2);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
-    });
-
-    /*
-      Given I chose "Drip Machine" on the Coffee Device Selection Screen
-      And I advanced to the Choose Cups Screen
-      When I enter "-1"
-      And I press "Continue"
-      Then I expect to still be on the Choose Cups Screen
-    */
-    test("should not advance from Choose Cups Screen with negative cup amount", () async {
-      //your code here
-      // from previous test, we should be in the Choose cups screen
+      // And I enter "-1" And I tap "Convert" Then I should see "Enter a valid BTC value"
+      // we expect to see the error message
       final textBox = find.byValueKey('text-box');
       await driver.tap(textBox);
       await driver.enterText('-1');
       await driver.waitFor(find.text('-1'));
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
+      final convertButton = find.byValueKey('convert-btn');
+      await driver.tap(convertButton);
+      expect(await driver.getText(find.text("Enter a valid BTC value")), "Enter a valid BTC value");
     });
-
   });
 
-  group('Back Button', () {
-    //make up your own tests to check that the back button works
-    //on every page
-    test('back button on recommended screen', () async {
-      // from previous test, we should be on the cup amount screen
-      // the following is done to set the app at recommended screen
-      final textBox = find.byValueKey('text-box');
-      await driver.tap(textBox);
-      await driver.enterText('');
-      await driver.waitFor(find.text(''));
-      await driver.enterText('1');
-      await driver.waitFor(find.text('1'));
-      final continueButton2 = find.byValueKey('continue2-btn');
-      await driver.tap(continueButton2);
-      // we expect to be taken back to the cup amount screen
-      final backButton = find.byValueKey('back-btn');
-      await driver.tap(backButton);
-      final numberOfCupsQuestion = find.byValueKey('cup-amount-question');
-      expect(await driver.getText(numberOfCupsQuestion), "How many cups would you like?");
-    });
-
-    test('back button on cup amount screen', () async {
-      // we expect to be taken back to machine selector screen
-      final backButton = find.byValueKey('back-btn');
-      await driver.tap(backButton);
-      final coffeeMakerQuestion = find.byValueKey('coffee-maker-question');
-      expect(await driver.getText(coffeeMakerQuestion), "What coffee maker are you using?");
-    });
   });
 
 }

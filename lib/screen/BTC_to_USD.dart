@@ -15,12 +15,18 @@ class _BTCToUSDConversionScreenState extends State<BTCToUSDConversionScreen> {
       showErrorMessage = false;
       try {
         double btcAmount = double.parse(btcController.text);
+        
+        if (btcAmount < 0) {
+          // Handle negative input
+          showErrorMessage = true;
+          return;
+        }
+
         // Implement your USD conversion logic here
-        // For example, you can use a conversion rate to calculate USD
-        double usdAmount = btcAmount * 34881; // Replace 50000 with the actual conversion rate. Current Rate $34881.00
+        double usdAmount = btcAmount * 34881; 
         result = usdAmount.toStringAsFixed(2); // Format to 2 decimal places
       } catch (e) {
-        // Handle invalid input
+        
         showErrorMessage = true;
       }
     });
@@ -37,6 +43,7 @@ class _BTCToUSDConversionScreenState extends State<BTCToUSDConversionScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextField(
+              key: Key('text-box'),
               controller: btcController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
@@ -45,12 +52,14 @@ class _BTCToUSDConversionScreenState extends State<BTCToUSDConversionScreen> {
               ),
             ),
             ElevatedButton(
+              key: Key('convert-btn'),
               onPressed: convertBTCToUSD,
               child: Text("Convert"),
             ),
             SizedBox(height: 20),
             Text(
               result,
+              key: Key('result-textbox'),
               style: TextStyle(
                 color: showErrorMessage ? Colors.red : Colors.green,
                 fontSize: 24,
