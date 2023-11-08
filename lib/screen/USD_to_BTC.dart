@@ -6,7 +6,7 @@ class USDToBTCConversionScreen extends StatefulWidget {
 }
 
 class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
-  TextEditingController btcController = TextEditingController();
+  TextEditingController usdController = TextEditingController();
   String result = "";
   bool showErrorMessage = false;
 
@@ -14,13 +14,18 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
     setState(() {
       showErrorMessage = false;
       try {
-        double usdAmount = double.parse(btcController.text);
-        // Implement your USD conversion logic here
-        // For example, you can use a conversion rate to calculate USD
-        double btcAmount = usdAmount / 34881; // Replace 50000 with the actual conversion rate. Current Rate $34881.00
+        double usdAmount = double.parse(usdController.text);
+        
+        if (usdAmount < 0) {
+          // Handle negative input
+          showErrorMessage = true;
+          return;
+        }
+
+        double btcAmount = usdAmount / 34881; 
         result = btcAmount.toStringAsFixed(2); // Format to 2 decimal places
       } catch (e) {
-        // Handle invalid input
+        
         showErrorMessage = true;
       }
     });
@@ -37,7 +42,8 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextField(
-              controller: btcController,
+              key: Key('text-box'),
+              controller: usdController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: "Enter USD",
@@ -45,12 +51,14 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
               ),
             ),
             ElevatedButton(
+              key: Key('convert-btn'),
               onPressed: convertUSDToBTC,
               child: Text("Convert"),
             ),
             SizedBox(height: 20),
             Text(
               result,
+              key: Key('result-textbox'),
               style: TextStyle(
                 color: showErrorMessage ? Colors.red : Colors.green,
                 fontSize: 24,

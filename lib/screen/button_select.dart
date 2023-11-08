@@ -47,9 +47,11 @@ class _BitcoinConverterScreenState extends State<BitcoinConverterScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text("Select Conversion Direction:",
+                key: Key('select-question'),
                 style: TextStyle(fontSize: 18)),
             SizedBox(height: 20),
             ElevatedButton(
+              key: Key('USD-to-BTC-btn'),
               onPressed: () => selectConversion(context, true),
               style: ElevatedButton.styleFrom(
                 primary: Colors.blue, // Button background color
@@ -62,6 +64,7 @@ class _BitcoinConverterScreenState extends State<BitcoinConverterScreen> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
+              key: Key('BTC-to-USD-btn'),
               onPressed: () => selectConversion(context, false),
               style: ElevatedButton.styleFrom(
                 primary: Colors.green, // Button background color
