@@ -1,42 +1,63 @@
-import 'package:flutter/material.dart';
+import 'dart:ffi';
+import 'package:http/http.dart' as http;
 
+import 'package:flutter/material.dart';
+import 'package:bitcoin_calculator/utils/converter_API_ADDED.dart';
 class BTCToUSDConversionScreen extends StatefulWidget {
   @override
   _BTCToUSDConversionScreenState createState() => _BTCToUSDConversionScreenState();
 }
 
 class _BTCToUSDConversionScreenState extends State<BTCToUSDConversionScreen> {
-  TextEditingController btcController = TextEditingController();
+  TextEditingController usdController = TextEditingController();
   String result = "";
   bool showErrorMessage = false;
+  Future<Map<String, dynamic>> currentBTC;
+  double btcRate;
 
-  void convertBTCToUSD() {
+  void convertBTCToUSD(double btcRate) {
     setState(() {
       showErrorMessage = false;
       try {
-        double btcAmount = double.parse(btcController.text);
+        double usdAmount = double.parse(usdController.text);
         
-        if (btcAmount < 0) {
+        if (usdAmount < 0) {
           // Handle negative input
           showErrorMessage = true;
           return;
         }
 
-        // Implement your USD conversion logic here
-        double usdAmount = btcAmount * 34881; 
-        result = usdAmount.toStringAsFixed(2); // Format to 2 decimal places
+        double btcAmount = usdAmount * btcRate; 
+        result = btcAmount.toStringAsFixed(2); 
       } catch (e) {
-        
         showErrorMessage = true;
       }
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    currentBTC = CoindeskAPI.fetchBitcoinPrice(http.Client());
+    currentBTC.then((bitcoinData) {
+      if (bitcoinData.containsKey('bpi') && bitcoinData['bpi'].containsKey('USD')) {
+        btcRate = bitcoinData['bpi']['USD']['rate_float'];
+        convertBTCToUSD(btcRate);
+      } else {
+        showErrorMessage = true;
+      }
+    }).catchError((error) {
+      print(error);
+      showErrorMessage = true;
+    });
+  }
+
+  @override
+ 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("BTC to USD Conversion"),
+        title: Text("BTC to USD"),
       ),
       body: Center(
         child: Column(
@@ -44,7 +65,7 @@ class _BTCToUSDConversionScreenState extends State<BTCToUSDConversionScreen> {
           children: <Widget>[
             TextField(
               key: Key('text-box'),
-              controller: btcController,
+              controller: usdController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: "Enter BTC",
@@ -53,7 +74,7 @@ class _BTCToUSDConversionScreenState extends State<BTCToUSDConversionScreen> {
             ),
             ElevatedButton(
               key: Key('convert-btn'),
-              onPressed: convertBTCToUSD,
+              onPressed: () => convertBTCToUSD(btcRate),
               child: Text("Convert"),
             ),
             SizedBox(height: 20),
