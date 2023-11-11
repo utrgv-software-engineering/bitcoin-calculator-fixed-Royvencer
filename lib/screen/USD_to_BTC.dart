@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:ffi';
+import 'package:http/http.dart' as http;
 
+import 'package:flutter/material.dart';
+import 'package:bitcoin_calculator/utils/converter_API_ADDED.dart';
 class USDToBTCConversionScreen extends StatefulWidget {
   @override
   _USDToBTCConversionScreenState createState() => _USDToBTCConversionScreenState();
@@ -9,8 +12,10 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
   TextEditingController usdController = TextEditingController();
   String result = "";
   bool showErrorMessage = false;
+  Future<Map<String, dynamic>> currentBTC;
+  double btcRate;
 
-  void convertUSDToBTC() {
+  void convertUSDToBTC(double btcRate) {
     setState(() {
       showErrorMessage = false;
       try {
@@ -22,16 +27,33 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
           return;
         }
 
-        double btcAmount = usdAmount / 34881; 
-        result = btcAmount.toStringAsFixed(2); // Format to 2 decimal places
+        double btcAmount = usdAmount / btcRate; 
+        result = btcAmount.toStringAsFixed(2); 
       } catch (e) {
-        
         showErrorMessage = true;
       }
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    currentBTC = CoindeskAPI.fetchBitcoinPrice(http.Client());
+    currentBTC.then((bitcoinData) {
+      if (bitcoinData.containsKey('bpi') && bitcoinData['bpi'].containsKey('USD')) {
+        btcRate = bitcoinData['bpi']['USD']['rate_float'];
+        convertUSDToBTC(btcRate);
+      } else {
+        showErrorMessage = true;
+      }
+    }).catchError((error) {
+      print(error);
+      showErrorMessage = true;
+    });
+  }
+
+  @override
+ 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +74,7 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
             ),
             ElevatedButton(
               key: Key('convert-btn'),
-              onPressed: convertUSDToBTC,
+              onPressed: () => convertUSDToBTC(btcRate),
               child: Text("Convert"),
             ),
             SizedBox(height: 20),
