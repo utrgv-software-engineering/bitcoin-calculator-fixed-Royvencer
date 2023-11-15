@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'package:bitcoin_calculator/config/globals.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class _USDToBTCConversionScreenState extends State<USDToBTCConversionScreen> {
   @override
   void initState() {
     super.initState();
-    currentBTC = CoindeskAPI.fetchBitcoinPrice(http.Client());
+    currentBTC = CoindeskAPI.fetchBitcoinPrice(httpClient);
     currentBTC.then((bitcoinData) {
       if (bitcoinData.containsKey('bpi') && bitcoinData['bpi'].containsKey('USD')) {
         btcRate = bitcoinData['bpi']['USD']['rate_float'];

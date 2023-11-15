@@ -45,7 +45,7 @@ void main() {
       final convertButton = find.byValueKey('convert-btn');
       await driver.tap(convertButton);
       final resultText = find.byValueKey('result-textbox');
-      expect(await driver.getText(resultText), "0.14");
+      expect(await driver.getText(resultText), "0.33");
       await driver.tap(find.pageBack());
     });
 
@@ -72,7 +72,7 @@ void main() {
       final convertButton = find.byValueKey('convert-btn');
       await driver.tap(convertButton);
       final resultText = find.byValueKey('result-textbox');
-      expect(await driver.getText(resultText), "174405.00");
+      expect(await driver.getText(resultText), "74672.92");
       await driver.tap(find.pageBack());
     });
 
